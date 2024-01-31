@@ -32,7 +32,7 @@ import (
 )
 
 //go:generate go run github.com/cilium/ebpf/cmd/bpf2go -target amd64,arm64 -cc clang -cflags $CFLAGS bpf ./bpf/probe.bpf.c
-
+// go generated
 const (
 	// name is the instrumentation name.
 	name = "net/http/client"
@@ -46,7 +46,7 @@ func New(logger logr.Logger) probe.Probe {
 		Name:            name,
 		Logger:          logger.WithName(name),
 		InstrumentedPkg: pkg,
-		Consts: []probe.Const{
+		Consts: []probe.Const{ // offsets of struct fields
 			probe.RegistersABIConst{},
 			probe.AllocationConst{},
 			probe.StructFieldConst{
@@ -76,12 +76,12 @@ func New(logger logr.Logger) probe.Probe {
 		},
 		Uprobes: map[string]probe.UprobeFunc[bpfObjects]{
 			"net/http.(*Client).do": uprobeDo,
-		},
+		}, // uprobe
 
 		ReaderFn: func(obj bpfObjects) (*perf.Reader, error) {
 			return perf.NewReader(obj.Events, os.Getpagesize())
 		},
-		SpecFn:    loadBpf,
+		SpecFn:    loadBpf, // loadBpf
 		ProcessFn: convertEvent,
 	}
 }
@@ -93,7 +93,7 @@ func uprobeDo(name string, exec *link.Executable, target *process.TargetDetails,
 	}
 
 	opts := &link.UprobeOptions{Address: offset}
-	l, err := exec.Uprobe("", obj.UprobeHttpClientDo, opts)
+	l, err := exec.Uprobe("", obj.UprobeHttpClientDo, opts) // uprobe
 	if err != nil {
 		return nil, err
 	}

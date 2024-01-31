@@ -81,6 +81,7 @@ func newLogger() logr.Logger {
 	return logger
 }
 
+// start
 // NewInstrumentation returns a new [Instrumentation] configured with the
 // provided opts.
 //
@@ -104,7 +105,7 @@ func NewInstrumentation(ctx context.Context, opts ...InstrumentationOption) (*In
 	}
 
 	pa := process.NewAnalyzer(logger)
-	pid, err := pa.DiscoverProcessID(&c.target)
+	pid, err := pa.DiscoverProcessID(&c.target) // pid
 	if err != nil {
 		return nil, err
 	}

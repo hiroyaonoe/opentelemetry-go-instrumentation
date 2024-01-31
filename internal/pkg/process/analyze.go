@@ -75,7 +75,7 @@ func (a *Analyzer) Analyze(pid int, relevantFuncs map[string]interface{}) (*Targ
 	}
 
 	defer f.Close()
-	elfF, err := elf.NewFile(f)
+	elfF, err := elf.NewFile(f) // ELF
 	if err != nil {
 		return nil, err
 	}

@@ -71,7 +71,7 @@ func (m *Manager) registerProbe(p probe.Probe) error {
 		return fmt.Errorf("library %s registered twice, aborting", name)
 	}
 
-	m.probes[name] = p
+	m.probes[name] = p // probe
 	return nil
 }
 
@@ -112,6 +112,7 @@ func (m *Manager) FilterUnusedProbes(target *process.TargetDetails) {
 	}
 }
 
+// run
 // Run runs the event processing loop for all managed probes.
 func (m *Manager) Run(ctx context.Context, target *process.TargetDetails) error {
 	if len(m.probes) == 0 {
@@ -125,7 +126,7 @@ func (m *Manager) Run(ctx context.Context, target *process.TargetDetails) error 
 	}
 
 	for _, i := range m.probes {
-		go i.Run(m.incomingEvents)
+		go i.Run(m.incomingEvents) // go Run ここでebpf?
 	}
 
 	for {
@@ -139,7 +140,7 @@ func (m *Manager) Run(ctx context.Context, target *process.TargetDetails) error 
 			m.cleanup(target)
 			return nil
 		case e := <-m.incomingEvents:
-			m.otelController.Trace(e)
+			m.otelController.Trace(e) // Trace
 		}
 	}
 }
@@ -162,7 +163,7 @@ func (m *Manager) load(target *process.TargetDetails) error {
 	// Load probes
 	for name, i := range m.probes {
 		m.logger.Info("loading probe", "name", name)
-		err := i.Load(exe, target)
+		err := i.Load(exe, target) // Load
 		if err != nil {
 			m.logger.Error(err, "error while loading probes, cleaning up", "name", name)
 			m.cleanup(target)
@@ -207,7 +208,7 @@ func (m *Manager) registerProbes() error {
 		grpcServer.New(m.logger),
 		httpServer.New(m.logger),
 		httpClient.New(m.logger),
-		gin.New(m.logger),
+		gin.New(m.logger), // TODO(ONOE): echoも欲しい
 		dbSql.New(m.logger),
 	}
 

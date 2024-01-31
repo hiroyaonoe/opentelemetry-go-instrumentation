@@ -98,7 +98,7 @@ func (i *Base[BPFObj, BPFEvent]) Manifest() Manifest {
 
 // Load loads all instrumentation offsets.
 func (i *Base[BPFObj, BPFEvent]) Load(exec *link.Executable, td *process.TargetDetails) error {
-	spec, err := i.SpecFn()
+	spec, err := i.SpecFn() // ebpfのload
 	if err != nil {
 		return err
 	}
@@ -162,7 +162,7 @@ func (i *Base[BPFObj, BPFEvent]) buildObj(exec *link.Executable, td *process.Tar
 // Run runs the events processing loop.
 func (i *Base[BPFObj, BPFEvent]) Run(dest chan<- *Event) {
 	for {
-		record, err := i.reader.Read()
+		record, err := i.reader.Read() // Read record
 		if err != nil {
 			if errors.Is(err, perf.ErrClosed) {
 				return
@@ -176,7 +176,7 @@ func (i *Base[BPFObj, BPFEvent]) Run(dest chan<- *Event) {
 			continue
 		}
 
-		e, err := i.processRecord(record)
+		e, err := i.processRecord(record) // incomingEvent
 		if err != nil {
 			i.Logger.Error(err, "failed to process perf record")
 		}
@@ -185,6 +185,7 @@ func (i *Base[BPFObj, BPFEvent]) Run(dest chan<- *Event) {
 	}
 }
 
+// recordを読んで、eventを作成する
 func (i *Base[BPFObj, BPFEvent]) processRecord(record perf.Record) (*Event, error) {
 	buf := bytes.NewBuffer(record.RawSample)
 
@@ -193,7 +194,7 @@ func (i *Base[BPFObj, BPFEvent]) processRecord(record perf.Record) (*Event, erro
 	if err != nil {
 		return nil, err
 	}
-	return i.ProcessFn(&event), nil
+	return i.ProcessFn(&event), nil // convertEvent
 }
 
 // Close stops the Probe.
